@@ -1,6 +1,4 @@
-include_recipe "artifact-deployer::artifacts"
-
-unless node['maven'].empty?
+if node.attribute?("maven")
   template  "#{node['maven']['m2_home']}/conf/settings.xml" do
     source  "settings.xml.erb"
     mode    0666
@@ -12,3 +10,6 @@ unless node['maven'].empty?
     to "/usr/local/maven/bin/mvn"
   end
 end
+
+include_recipe "artifact-deployer::artifacts"
+include_recipe "artifact-deployer::route53"
