@@ -3,7 +3,7 @@ if node.attribute?("solr_host")
   tomcat_default = node[:solr_host][:tomcat_path]
   add_host_param = node[:solr_host][:add_host_param]
 
-  if add_host_param do
+  if add_host_param
     ruby_block "Add JVM params to Tomcat" do
       block do
         fe = Chef::Util::FileEdit.new(tomcat_default)
