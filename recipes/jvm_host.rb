@@ -1,9 +1,9 @@
 if node.attribute?("jvm_host")
   
   tomcat_defaults_path = node[:jvm_host][:tomcat_defaults_path]
-  add_host_param = node[:jvm_host][:add_host_param] || true
-  param_name = node[:jvm_host][:param_name] || "host"
-  hostname = node[:jvm_host][:hostname] || "#{node[:hostname]}.#{node[:resolver][:search]}"
+  add_host_param = node[:jvm_host][:add_host_param]
+  param_name = node[:jvm_host][:param_name]
+  hostname = node[:jvm_host][:hostname]
 
   if add_host_param
     ruby_block "Add JVM params to Tomcat" do
