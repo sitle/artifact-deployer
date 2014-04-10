@@ -7,6 +7,15 @@ It also adds some DNS and JVM utils to automate Solr Cloud deployment on AWS
 Here's how you can deploy Apache Solr on a running Apache Tomcat:
 
 ```
+"maven": {
+    "repos": {
+        "maven-repo-id": {
+            "url": "https://your.maven.repo/repo",
+            "username": "mavenrepo-user",
+            "password": "mavenrepo-pwd"
+        }
+    }
+},
 "artifacts": {
     "solr-home": {
         "groupId": "it.session.solr",
@@ -31,7 +40,7 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
     "add_host_param" : true
 },
 "route53" : {
-    "zone_id" : "Z2XX8ADRID4STQ",
+    "zone_id" : "XXXXXXXXXXXX",
     "aws_access_key_id" : "XXXXXXXXXXXXXXXXXXXX",
     "aws_secret_access_key" : "XXXXXXXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXX"
 }
