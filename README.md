@@ -26,8 +26,7 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
         "owner": "tomcat7"
     }
 },
-"opsworks_java" : {
-    "jvm_options" : "-Xmx700M -XX:MaxPermSize=200M -Dsolr.solr.home=/var/lib/tomcat7/solr-home -Dsolr.data.dir=/var/lib/tomcat7/solr-data",
+"solr_host" : {
     "add_host_param" : true
 },
 "route53" : {
@@ -40,6 +39,5 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
 This configuration contains:
 - The configuration for my personal Maven Artifact Repository that hosts my snapshot dependencies, including the configuration of the Solr instance to run
 - The configuration for the deployment of 2 artifacts: the Solr WAR and configuration (aka SOLR_HOME)
-- The configuration of the JVM_OPTS mentioning the paths used for Solr installation; this option definition depends on the container you'll be using
-  - the _add_host_param_ attributes adds a -Dhost=<hostname>.<domain> in the JVM params, which is crucial for Solr Cloud deployments
-- The Route53 Zone (and AWS auth) info that allows to subscribe the current machine DNS entry 
+- The configuration of the Solr host JVM Param (-Dhost=<hostname>.<domain>); hostname and domain are taken from AWS OpsWorks attributes
+- The Route53 Zone (and AWS auth) info that allows to subscribe the current machine DNS entry
