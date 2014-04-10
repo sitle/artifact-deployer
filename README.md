@@ -2,6 +2,7 @@ Artifact Deployer
 ---
 
 A Chef Cookbook that wraps the (Apache) Maven recipe that makes dependency fetching and unpacking dead easy.
+It also adds some DNS and JVM utils to automate Solr Cloud deployment on AWS
 
 Here's how you can deploy Apache Solr on a running Apache Tomcat:
 
