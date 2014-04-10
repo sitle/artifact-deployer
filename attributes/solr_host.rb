@@ -1,1 +1,0 @@
-default['solr_host']['tomcat_path'] = "/ect/default/tomcat7"

@@ -11,4 +11,4 @@ depends "maven"
 recipe 'default', 'Installs Apache Maven'
 recipe 'artifacts', 'Installs Maven artifacts'
 recipe 'route53', 'Installs Maven artifacts'
-recipe 'solr_host', 'Adds -Dhost=#{node[:hostname]}.#{node[:resolver][:search]} to the Tomcat opts'
+recipe 'jvm_host', 'Adds -Dhost=#{node[:hostname]}.#{node[:resolver][:search]} to the JVM opts, appending it to a configurable file location'

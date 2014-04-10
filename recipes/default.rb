@@ -17,4 +17,4 @@ end
 
 include_recipe "artifact-deployer::artifacts"
 include_recipe "artifact-deployer::route53"
-include_recipe "artifact-deployer::solr_host"
+include_recipe "artifact-deployer::jvm_host"
