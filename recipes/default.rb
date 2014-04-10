@@ -1,3 +1,5 @@
+include_recipe "maven::default"
+
 if node.attribute?("maven")
   template  "#{node['maven']['m2_home']}/conf/settings.xml" do
     source  "settings.xml.erb"
@@ -13,3 +15,4 @@ end
 
 include_recipe "artifact-deployer::artifacts"
 include_recipe "artifact-deployer::route53"
+include_recipe "artifact-deployer::solr_host"
