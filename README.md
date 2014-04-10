@@ -27,7 +27,7 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
         "owner": "tomcat7"
     }
 },
-"solr_host" : {
+"jvm_host" : {
     "add_host_param" : true
 },
 "route53" : {
