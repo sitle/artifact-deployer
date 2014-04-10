@@ -1,6 +1,6 @@
 if node.attribute?("jvm_host")
   
-  tomcat_defaults_path = node[:jvm_host][:tomcat_defaults_path] || "/ect/default/tomcat7"
+  tomcat_defaults_path = node[:jvm_host][:tomcat_defaults_path]
   add_host_param = node[:jvm_host][:add_host_param] || true
   param_name = node[:jvm_host][:param_name] || "host"
   hostname = node[:jvm_host][:hostname] || "#{node[:hostname]}.#{node[:resolver][:search]}"
