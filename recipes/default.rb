@@ -6,10 +6,12 @@ if node.attribute?("maven")
     mode    0666
     owner   "root"
     group   "root"
+    subscribes :create, "ark[maven]", :immediately
   end
 
   link "/usr/bin/mvn" do
     to "/usr/local/maven/bin/mvn"
+    subscribes :create, "template[#{node['maven']['m2_home']}/conf/settings.xml]", :immediately
   end
 end
 
