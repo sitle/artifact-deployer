@@ -1,3 +1,5 @@
+default['restart_services'] = ['tomcat7']
+
 default['jvm_host']['tomcat_defaults_path'] = "/etc/default/tomcat7"
 
 default['jvm_host']['add_host_param'] = false
