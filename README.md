@@ -18,6 +18,7 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
 },
 "artifacts": {
     "solr-home": {
+        "enabled": true,
         "groupId": "it.session.solr",
         "artifactId": "solr-data",
         "type": "zip",
@@ -28,6 +29,7 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
         "unzip": true
     },
     "solr": {
+        "enabled": true,
         "groupId": "org.apache.solr",
         "artifactId": "solr",
         "type": "war",
