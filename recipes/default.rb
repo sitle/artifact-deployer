@@ -1,11 +1,5 @@
 restart_services = node['restart_services']
 
-restart_services.each do |serviceName|
-  service serviceName  do
-    action      :stop
-  end
-end
-
 include_recipe "maven::default"
 
 if node.attribute?("maven")
@@ -29,6 +23,6 @@ include_recipe "artifact-deployer::jvm_host"
 
 restart_services.each do |serviceName|
   service serviceName  do
-    action      :start
+    action      :restart
   end
 end
