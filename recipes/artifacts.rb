@@ -15,11 +15,12 @@ end
 node[:artifacts].each do |artifactName, artifact|
 
   artifactType  = artifact[:type] ? artifact[:type] : "jar"
-  owner         = artifact[:owner]
+  owner         = artifact[:owner] ? artifact[:owner] : "root"
   unzip         = artifact[:unzip] ? artifact[:unzip] : false
   classifier    = artifact[:classifier] ? artifact[:classifier] : ""
   destination   = artifact[:destination]
-  enabled      = artifact[:enabled]
+  enabled       = artifact[:enabled]
+  properties    = artifact[:properties]
 
   if enabled == true
     maven "#{artifactName}" do
@@ -48,6 +49,16 @@ node[:artifacts].each do |artifactName, artifact|
         command     "unzip -q -u -o  #{chef_cache}/#{artifactName}.#{artifactType} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
         user        owner
       end
+      
+      properties.each do |fileToPatch, propertyMap|
+        propertyMap.each do |propName, propValue|
+          file_replace_line "#{destination}/#{artifactName}/#{fileToPatch}" do
+            replace "#{propName}="
+            with    "#{propName}=#{propValue}"
+          end
+        end
+      end
+        
     else
       execute "unzipping_package-#{artifactName}" do
         command     "cp -Rf #{chef_cache}/#{artifactName}.#{artifactType} #{destination}/#{artifactName}.#{artifactType}; chown -R #{owner} #{destination}/#{artifactName}.#{artifactType}"
