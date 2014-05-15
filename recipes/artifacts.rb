@@ -1,3 +1,7 @@
+term_delimiter_start = node['term_delimiter_start']
+term_delimiter_end = node['term_delimiter_end']
+property_equals_sign = node['property_equals_sign']
+
 repositories = []
 node[:maven][:repos].each do |repoName, repo|
   repositories.push "#{repoName}::::#{repo[:url]}"
@@ -85,7 +89,7 @@ node[:artifacts].each do |artifactName, artifact|
     terms.each do |fileToPatch, termMap|
       termMap.each do |termMatch, termReplacement|
         file_replace "#{destination}/#{artifactName}/#{fileToPatch}" do
-          replace "@@#{termMatch}@@"
+          replace "#{term_delimiter_start}#{termMatch}#{term_delimiter_end}"
           with    "#{termReplacement}"
         end
       end
