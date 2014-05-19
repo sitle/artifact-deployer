@@ -18,18 +18,18 @@ end
 
 node[:artifacts].each do |artifactName, artifact|
 
-  artifact_id   = artifact[:artifactId]
-  group_id      = artifact[:groupId]
-  version       = artifact[:version]
-  artifactType  = artifact[:type] ? artifact[:type] : "jar"
-  owner         = artifact[:owner] ? artifact[:owner] : "root"
-  unzip         = artifact[:unzip] ? artifact[:unzip] : false
-  classifier    = artifact[:classifier] ? artifact[:classifier] : ""
-  destination   = artifact[:destination]
-  enabled       = artifact[:enabled] ? artifact[:enabled] : false
-  properties    = artifact[:properties] ? artifact[:properties] : []
-  terms         = artifact[:terms] ? artifact[:terms] : []
-  filtering_mode = artifact[:filtering_mode] ? artifact[:filtering_mode] : "replace"
+  artifact_id     = artifact[:artifactId]
+  group_id        = artifact[:groupId]
+  version         = artifact[:version]
+  artifactType    = artifact[:type] ? artifact[:type] : "jar"
+  owner           = artifact[:owner] ? artifact[:owner] : "root"
+  unzip           = artifact[:unzip] ? artifact[:unzip] : false
+  classifier      = artifact[:classifier] ? artifact[:classifier] : ""
+  destination     = artifact[:destination]
+  enabled         = artifact[:enabled] ? artifact[:enabled] : false
+  properties      = artifact[:properties] ? artifact[:properties] : []
+  terms           = artifact[:terms] ? artifact[:terms] : []
+  filtering_mode  = artifact[:filtering_mode] ? artifact[:filtering_mode] : "replace"
 
   if enabled == true
     if artifact_id and group_id and version
@@ -48,10 +48,10 @@ node[:artifacts].each do |artifactName, artifact|
       end
 
       directory "fix-permissions-on-destination-folder-for-#{artifactName}" do
-        path    destination
-        owner   owner
-        action  :create
-        subscribes  :create, "maven[#{artifactName}]"
+        path          destination
+        owner         owner
+        action        :create
+        subscribes    :create, "maven[#{artifactName}]"
       end
 
       if unzip == true
@@ -68,19 +68,19 @@ node[:artifacts].each do |artifactName, artifact|
     end
 
     properties.each do |fileToPatch, propertyMap|
-      filtering_mode = propertyMap[:filtering_mode] ? propertyMap[:filtering_mode] : filtering_mode
+      filtering_mode  = propertyMap[:filtering_mode] ? propertyMap[:filtering_mode] : filtering_mode
       if filtering_mode == "replace"
         propertyMap.each do |propName, propValue|
           file_replace_line "#{destination}/#{artifactName}/#{fileToPatch}" do
-            replace "#{propName}="
-            with    "#{propName}=#{propValue}"
+            replace   "#{propName}="
+            with      "#{propName}=#{propValue}"
             only_if { File.exist?("#{destination}/#{artifactName}/#{fileToPatch}") }
           end
         end
       elsif filtering_mode == "append"
         propertyMap.each do |propName, propValue|
           file_append "#{destination}/#{artifactName}/#{fileToPatch}" do
-            line    "#{propName}=#{propValue}"
+            line      "#{propName}=#{propValue}"
           end
         end
       end
@@ -88,9 +88,9 @@ node[:artifacts].each do |artifactName, artifact|
 
     terms.each do |fileToPatch, termMap|
       termMap.each do |termMatch, termReplacement|
-        file_replace "#{destination}/#{artifactName}/#{fileToPatch}" do
-          replace "#{term_delimiter_start}#{termMatch}#{term_delimiter_end}"
-          with    "#{termReplacement}"
+        file_replace  "#{destination}/#{artifactName}/#{fileToPatch}" do
+          replace     "#{term_delimiter_start}#{termMatch}#{term_delimiter_end}"
+          with        "#{termReplacement}"
         end
       end
     end
