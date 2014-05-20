@@ -25,6 +25,7 @@ node[:artifacts].each do |artifactName, artifact|
   owner           = artifact[:owner] ? artifact[:owner] : "root"
   unzip           = artifact[:unzip] ? artifact[:unzip] : false
   classifier      = artifact[:classifier] ? artifact[:classifier] : ""
+  subfolder       = artifact[:subfolder] ? artifact[:subfolder] : ""
   destination     = artifact[:destination]
   enabled         = artifact[:enabled] ? artifact[:enabled] : false
   properties      = artifact[:properties] ? artifact[:properties] : []
@@ -56,7 +57,7 @@ node[:artifacts].each do |artifactName, artifact|
 
       if unzip == true
         execute "unzipping_package-#{artifactName}" do
-          command     "unzip -q -u -o  #{chef_cache}/#{artifactName}.#{artifactType} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
+          command     "unzip -q -u -o  #{chef_cache}/#{artifactName}.#{artifactType} #{subfolder} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
           user        owner
         end
       else
