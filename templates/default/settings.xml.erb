@@ -8,11 +8,11 @@
     |-->
 
     <servers>
-        <% node[:maven][:repos].each do |repoName, repo| %>
+        <% @repos.each do |repo| %>
             <server>
-                <id><%= repoName %></id>
-                <username><%= repo[:username] %></username>
-                <password><%= repo[:password] %></password>
+                <id><%= repo['id'] %></id>
+                <username><%= repo['username'] %></username>
+                <password><%= repo['password'] %></password>
             </server>
         <% end %>
     </servers>

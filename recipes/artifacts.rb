@@ -2,9 +2,11 @@ term_delimiter_start = node['term_delimiter_start']
 term_delimiter_end = node['term_delimiter_end']
 property_equals_sign = node['property_equals_sign']
 
-repositories = []
-node[:maven][:repos].each do |repoName, repo|
-  repositories.push "#{repoName}::::#{repo[:url]}"
+
+@maven_repos = MavenReposCookbook.repos
+maven_repos_str = []
+@maven_repos.each do |repo|
+  maven_repos_str.push "#{repo['id']}::::#{repo['url']}"
 end
 
 chef_cache   = "/var/chef/cache"
@@ -45,7 +47,7 @@ node[:artifacts].each do |artifactName, artifact|
         dest          chef_cache
         owner         owner
         packaging     artifactType
-        repositories  repositories
+        repositories  maven_repos_str
       end
 
       directory "fix-permissions-on-destination-folder-for-#{artifactName}" do

@@ -1,20 +1,21 @@
-#restart_services = node['restart_services']
-
 include_recipe "maven::default"
 
-if node.attribute?("maven")
-  template  "#{node['maven']['m2_home']}/conf/settings.xml" do
-    source  "settings.xml.erb"
-    mode    0666
-    owner   "root"
-    group   "root"
-    subscribes :create, "ark[maven]", :immediately
-  end
+m2_home = node['maven']['m2_home']
 
-  link "/usr/bin/mvn" do
-    to "/usr/local/maven/bin/mvn"
-    subscribes :create, "template[#{node['maven']['m2_home']}/conf/settings.xml]", :immediately
-  end
+template  "#{m2_home}/conf/settings.xml" do
+  source  "settings.xml.erb"
+  mode    0666
+  owner   "root"
+  group   "root"
+  variables(
+    :repos => MavenReposCookbook.repos
+  )
+  subscribes :create, "ark[maven]", :immediately
+end
+
+link "/usr/bin/mvn" do
+  to "/usr/local/maven/bin/mvn"
+  subscribes :create, "template[#{m2_home}/conf/settings.xml]", :immediately
 end
 
 include_recipe "artifact-deployer::artifacts"
