@@ -9,3 +9,5 @@ default['jvm_host']['hostname'] = "#{node[:hostname]}.#{node[:domain]}"
 default['term_delimiter_start'] = "@@"
 default['term_delimiter_end'] = "@@"
 default['property_equals_sign'] = "="
+
+default['maven']['master_password'] = ""

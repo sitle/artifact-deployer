@@ -13,7 +13,7 @@ template  "#{m2_home}/conf/settings.xml" do
   )
 end
 
-unless master_password.nil? and master_password.empty?
+if !master_password.empty?
   directory  "/root/.m2" do
     mode    0666
     owner   "root"
