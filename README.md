@@ -66,6 +66,7 @@ Filtering can be used via ```terms``` or ```properties``` attributes defined wit
 - *attributes* maps the original string with the new ones to be injected
 
 When using ```terms```, each attribute's key is replaced with the attribute's value.
+
 When using ```properties```, a file line starting with ```<key>=``` will be searched and replaced with ```<key>=<value>```; if the line doesn't exist, by default nothing will happen (unless ```filtering_mode``` is set to ```append```); if the file doesn't exist, it will be created.
 
 To access private Maven repositories, you can easily define your credentials (password encryption is supported, although it's strongly recommended to wipe out your Maven settings right after Chef installation is terminated)
