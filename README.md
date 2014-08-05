@@ -50,6 +50,10 @@ Unpacking and filtering
           "archive-SpacesStore/conf/solrcore.properties" : [
             "alfresco.host" : "192.168.0.22",
             "solr.secureComms" : "none"
+          ],
+          "test.properties" : [
+            "my.host" : "192.168.0.22",
+            "filtering_mode" : "append"
           ]
         },
         "terms" : {
@@ -69,6 +73,10 @@ When using ```terms```, each attribute's key is replaced with the attribute's va
 
 When using ```properties```, a file line starting with ```<key>=``` will be searched and replaced with ```<key>=<value>```; if the line doesn't exist, by default nothing will happen (unless ```filtering_mode``` is set to ```append```); if the file doesn't exist, it will be created.
 
+```filtering_mode``` can be specified at artifact level or as an attribute of properties, as shown in the example above.
+
+Maven Private Repositories
+---
 To access private Maven repositories, you can easily define your credentials (password encryption is supported, although it's strongly recommended to wipe out your Maven settings right after Chef installation is terminated)
 
 ```
