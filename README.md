@@ -1,10 +1,74 @@
 Artifact Deployer
 ---
 
-A Chef Cookbook that wraps the (Apache) Maven recipe that makes dependency fetching and unpacking dead easy.
-It also adds some DNS and JVM utils to automate Solr Cloud deployment on AWS
+A Chef Cookbook that provides a simple way to download, unpack and configure artifacts.
+Download is offered via
+- Maven GAV coordinates
+- HTTP Url
+- File-system path
 
-Here's how you can deploy Apache Solr on a running Apache Tomcat:
+```
+"artifacts": {
+    "solr-home": {
+        "enabled": true,
+        "url": "https://artifacts.alfresco.com/nexus/service/local/artifact/maven/redirect?r=releases&g=org.alfresco&a=alfresco-solr&v=5.0.a&e=zip&c=config",
+        "destination": "/var/lib/tomcat7",
+        "owner": "tomcat7",
+        "unzip": true
+    },
+    "alfresco": {
+        "enabled": true,
+        "groupId": "org.alfresco",
+        "artifactId": "alfresco",
+        "type": "war",
+        "version": "5.0.a",
+        "destination": "/var/lib/tomcat7/webapps",
+        "owner": "tomcat7"
+    },
+    "pathPrefix" : "/vagrant",
+    "my-amp": {
+        "enabled": true,
+        "path": "my-amp/target/my-amp.amp",
+        "destination": "/var/lib/tomcat7/amps",
+        "owner": "tomcat7"
+    }
+}
+```
+Unpacking and filtering
+---
+
+```
+"artifacts": {
+    "solr-home": {
+        "enabled": true,
+        "url": "https://artifacts.alfresco.com/nexus/service/local/artifact/maven/redirect?r=releases&g=org.alfresco&a=alfresco-solr&v=5.0.a&e=zip&c=config",
+        "destination": "/var/lib/tomcat7",
+        "owner": "tomcat7",
+        "unzip": true,
+        "filtering_mode" : "replace",
+        "properties" : {
+          "archive-SpacesStore/conf/solrcore.properties" : [
+            "alfresco.host" : "192.168.0.22",
+            "solr.secureComms" : "none"
+          ]
+        },
+        "terms" : {
+          "context.xml" : [
+            "@@ALFRESCO_HOST@@" : "192.168.0.22"
+          ]
+        }
+    }
+}
+```
+
+Filtering can be used via ```terms``` or ```properties``` attributes defined within the artifact configuration; each of those contain a list of ```file path(String) => attributes(Map<String,String>)```, where
+- *file path* is the path, within the unpacked ZIP file, of the file that needs to be patched
+- *attributes* maps the original string with the new ones to be injected
+
+When using ```terms```, each attribute's key is replaced with the attribute's value.
+When using ```properties```, a file line starting with ```<key>=``` will be searched and replaced with ```<key>=<value>```; if the line doesn't exist, by default nothing will happen (unless ```filtering_mode``` is set to ```append```); if the file doesn't exist, it will be created.
+
+To access private Maven repositories, you can easily define your credentials (password encryption is supported, although it's strongly recommended to wipe out your Maven settings right after Chef installation is terminated)
 
 ```
 "maven": {
@@ -15,29 +79,18 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
             "password": "mavenrepo-pwd"
         }
     }
-},
-"artifacts": {
-    "solr-home": {
-        "enabled": true,
-        "groupId": "it.session.solr",
-        "artifactId": "solr-data",
-        "type": "zip",
-        "classifier": "solr-home",
-        "version": "0.1-SNAPSHOT",
-        "destination": "/var/lib/tomcat7",
-        "owner": "tomcat7",
-        "unzip": true
-    },
-    "solr": {
-        "enabled": true,
-        "groupId": "org.apache.solr",
-        "artifactId": "solr",
-        "type": "war",
-        "version": "4.7.1",
-        "destination": "/var/lib/tomcat7/webapps",
-        "owner": "tomcat7"
-    }
-},
+}
+```
+
+DNS and JVM Utils
+---
+Artifact Deployer also includes some DNS and JVM utils to automate AWS deployments.
+
+The following configuration contains:
+- JVM ```-Dhost=hostname.domain``` param; hostname and domain are taken from AWS OpsWorks attributes
+- Route53 Zone (and AWS auth) info that allows to subscribe the current machine DNS entry
+
+```
 "jvm_host" : {
     "add_host_param" : true
 },
@@ -47,9 +100,3 @@ Here's how you can deploy Apache Solr on a running Apache Tomcat:
     "aws_secret_access_key" : "XXXXXXXXXXXXXXXXXXXX/XXXXXXXXXXXXXXXXXXXX"
 }
 ```
-
-This configuration contains:
-- The configuration for my personal Maven Artifact Repository that hosts my snapshot dependencies, including the configuration of the Solr instance to run
-- The configuration for the deployment of 2 artifacts: the Solr WAR and configuration (aka SOLR_HOME)
-- The configuration of the Solr host JVM Param (-Dhost=hostname.domain); hostname and domain are taken from AWS OpsWorks attributes
-- The Route53 Zone (and AWS auth) info that allows to subscribe the current machine DNS entry

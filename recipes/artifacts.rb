@@ -18,8 +18,10 @@ directory "chef-cache" do
   action  :create
 end
 
+pathPrefix = node[:artifactPathPrefix]
 node[:artifacts].each do |artifactName, artifact|
-
+  url             = artifact[:url]
+  path            = artifact[:path] ? "#{pathPrefix}/#{artifact[:path]}" : nil
   artifact_id     = artifact[:artifactId]
   group_id        = artifact[:groupId]
   version         = artifact[:version]
@@ -33,9 +35,22 @@ node[:artifacts].each do |artifactName, artifact|
   properties      = artifact[:properties] ? artifact[:properties] : []
   terms           = artifact[:terms] ? artifact[:terms] : []
   filtering_mode  = artifact[:filtering_mode] ? artifact[:filtering_mode] : "replace"
+  fileName        = "#{artifactName}.#{artifactType}"
 
   if enabled == true
-    if artifact_id and group_id and version
+    if path
+      fileName = File.basename(path)
+      artifactType = File.extname(fileName).split('.').last
+      execute "cache-artifact-#{artifactName}" do
+        command       "cp -Rf #{path} #{chef_cache}/#{fileName}"
+      end
+    elsif url
+      fileName = File.basename(url)
+      artifactType = File.extname(fileName).split('.').last
+      remote_file     "#{chef_cache}/#{fileName}" do
+        source        url
+      end
+    elsif artifact_id and group_id and version
       maven "#{artifactName}" do
         artifact_id   artifact_id
         group_id      group_id
@@ -49,24 +64,24 @@ node[:artifacts].each do |artifactName, artifact|
         packaging     artifactType
         repositories  maven_repos_str
       end
+    end
 
-      directory "fix-permissions-on-destination-folder-for-#{artifactName}" do
-        path          destination
-        owner         owner
-        action        :create
-        subscribes    :create, "maven[#{artifactName}]"
+    directory "fix-permissions-on-destination-folder-for-#{artifactName}" do
+      path          destination
+      owner         owner
+      action        :create
+    end
+
+    if unzip == true
+      execute "unzipping-package-#{fileName}" do
+        command     "unzip -q -u -o  #{chef_cache}/#{fileName} #{subfolder} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
+        user        owner
       end
-
-      if unzip == true
-        execute "unzipping_package-#{artifactName}" do
-          command     "unzip -q -u -o  #{chef_cache}/#{artifactName}.#{artifactType} #{subfolder} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
-          user        owner
-        end
-      else
-        execute "unzipping_package-#{artifactName}" do
-          command     "cp -Rf #{chef_cache}/#{artifactName}.#{artifactType} #{destination}/#{artifactName}.#{artifactType}; chown -R #{owner} #{destination}/#{artifactName}.#{artifactType}"
-          user        owner
-        end
+    else
+      execute "copying-package-#{fileName}" do
+        command     "cp -Rf #{chef_cache}/#{fileName} #{destination}/#{fileName}; chown -R #{owner} #{destination}/#{fileName}"
+        user        owner
+        only_if     "test -f #{chef_cache}/#{fileName}"
       end
     end
 
@@ -77,13 +92,14 @@ node[:artifacts].each do |artifactName, artifact|
           file_replace_line "#{destination}/#{artifactName}/#{fileToPatch}" do
             replace   "#{propName}="
             with      "#{propName}=#{propValue}"
-            only_if { File.exist?("#{destination}/#{artifactName}/#{fileToPatch}") }
+            only_if   "test -f #{destination}/#{artifactName}/#{fileToPatch}"
           end
         end
       elsif filtering_mode == "append"
         propertyMap.each do |propName, propValue|
           file_append "#{destination}/#{artifactName}/#{fileToPatch}" do
             line      "#{propName}=#{propValue}"
+            only_if   "test -f #{destination}/#{artifactName}/#{fileToPatch}"
           end
         end
       end
@@ -94,10 +110,9 @@ node[:artifacts].each do |artifactName, artifact|
         file_replace  "#{destination}/#{artifactName}/#{fileToPatch}" do
           replace     "#{term_delimiter_start}#{termMatch}#{term_delimiter_end}"
           with        "#{termReplacement}"
+          only_if     "test -f #{destination}/#{artifactName}/#{fileToPatch}"
         end
       end
     end
   end
 end
-
-
