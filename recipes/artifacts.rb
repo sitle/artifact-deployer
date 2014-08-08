@@ -37,6 +37,8 @@ node[:artifacts].each do |artifactName, artifact|
   filtering_mode  = artifact[:filtering_mode] ? artifact[:filtering_mode] : "replace"
   fileName        = "#{artifactName}.#{artifactType}"
 
+  log "Processing artifact #{artifactName}.#{artifactType}; unzip: #{unzip}"
+
   if enabled == true
     if path
       fileName = File.basename(path)
@@ -76,6 +78,7 @@ node[:artifacts].each do |artifactName, artifact|
       execute "unzipping-package-#{fileName}" do
         command     "unzip -q -u -o  #{chef_cache}/#{fileName} #{subfolder} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
         user        owner
+        only_if     "test -f #{chef_cache}/#{fileName}"
       end
     else
       execute "copying-package-#{fileName}" do
