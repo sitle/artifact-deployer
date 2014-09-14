@@ -31,25 +31,24 @@ node[:artifacts].each do |artifactName, artifact|
   classifier      = artifact[:classifier] ? artifact[:classifier] : ""
   subfolder       = artifact[:subfolder] ? artifact[:subfolder] : ""
   destination     = artifact[:destination]
+  destinationName = artifact[:destinationName] ? artifact[:destinationName] : "#{artifactName}"
   enabled         = artifact[:enabled] ? artifact[:enabled] : false
   properties      = artifact[:properties] ? artifact[:properties] : []
   terms           = artifact[:terms] ? artifact[:terms] : []
   filtering_mode  = artifact[:filtering_mode] ? artifact[:filtering_mode] : "replace"
-  fileName        = "#{artifactName}.#{artifactType}"
-
-  log "Processing artifact #{artifactName}.#{artifactType}; unzip: #{unzip}"
+  fileNameWithExt = "#{destinationName}.#{artifactType}"
+  destinationPath = "#{destination}/#{destinationName}"
 
   if enabled == true
+    log "Processing artifact #{destinationName}.#{artifactType}; unzip: #{unzip}"
     if path
-      fileName = File.basename(path)
-      artifactType = File.extname(fileName).split('.').last
-      execute "cache-artifact-#{artifactName}" do
-        command       "cp -Rf #{path} #{chef_cache}/#{fileName}"
+      fileNameWithExt = File.basename(path)
+      execute "cache-artifact-#{destinationName}" do
+        command       "cp -Rf #{path} #{chef_cache}/#{fileNameWithExt}"
       end
     elsif url
-      fileName = File.basename(url)
-      artifactType = File.extname(fileName).split('.').last
-      remote_file     "#{chef_cache}/#{fileName}" do
+      fileNameWithExt = File.basename(url)
+      remote_file     "#{chef_cache}/#{fileNameWithExt}" do
         source        url
       end
     elsif artifact_id and group_id and version
@@ -68,23 +67,23 @@ node[:artifacts].each do |artifactName, artifact|
       end
     end
 
-    directory "fix-permissions-on-destination-folder-for-#{artifactName}" do
+    directory "fix-permissions-#{destination}" do
       path          destination
       owner         owner
       action        :create
     end
 
     if unzip == true
-      execute "unzipping-package-#{fileName}" do
-        command     "unzip -q -u -o  #{chef_cache}/#{fileName} #{subfolder} -d #{destination}/#{artifactName}; chown -R #{owner} #{destination}/#{artifactName}; chmod -R 755 #{destination}/#{artifactName}"
+      execute "unzipping-package-#{destinationName}" do
+        command     "unzip -q -u -o  #{chef_cache}/#{fileNameWithExt} #{subfolder} -d #{destinationPath}; chown -R #{owner} #{destinationPath}; chmod -R 755 #{destinationPath}"
         user        owner
-        only_if     "test -f #{chef_cache}/#{fileName}"
+        only_if     "test -f #{chef_cache}/#{fileNameWithExt}"
       end
     else
-      execute "copying-package-#{fileName}" do
-        command     "cp -Rf #{chef_cache}/#{fileName} #{destination}/#{fileName}; chown -R #{owner} #{destination}/#{fileName}"
+      execute "copying-package-#{fileNameWithExt}" do
+        command     "cp -Rf #{chef_cache}/#{fileNameWithExt} #{destination}/#{fileNameWithExt}; chown -R #{owner} #{destination}/#{fileNameWithExt}"
         user        owner
-        only_if     "test -f #{chef_cache}/#{fileName}"
+        only_if     "test -f #{chef_cache}/#{fileNameWithExt}"
       end
     end
 
@@ -92,17 +91,17 @@ node[:artifacts].each do |artifactName, artifact|
       filtering_mode  = propertyMap[:filtering_mode] ? propertyMap[:filtering_mode] : filtering_mode
       if filtering_mode == "replace"
         propertyMap.each do |propName, propValue|
-          file_replace_line "#{destination}/#{artifactName}/#{fileToPatch}" do
+          file_replace_line "#{destinationPath}/#{fileToPatch}" do
             replace   "#{propName}="
             with      "#{propName}=#{propValue}"
-            only_if   "test -f #{destination}/#{artifactName}/#{fileToPatch}"
+            only_if   "test -f #{destinationPath}/#{fileToPatch}"
           end
         end
       elsif filtering_mode == "append"
         propertyMap.each do |propName, propValue|
-          file_append "#{destination}/#{artifactName}/#{fileToPatch}" do
+          file_append "#{destinationPath}/#{fileToPatch}" do
             line      "#{propName}=#{propValue}"
-            only_if   "test -f #{destination}/#{artifactName}/#{fileToPatch}"
+            only_if   "test -f #{destinationPath}/#{fileToPatch}"
           end
         end
       end

@@ -75,6 +75,44 @@ When using ```properties```, a file line starting with ```<key>=``` will be sear
 
 ```filtering_mode``` can be specified at artifact level or as an attribute of properties, as shown in the example above.
 
+Unpacking options
+---
+
+#### Artifact name
+
+The name of the file/folder fetched by artifact-deployer can be customised; by default it is the name of the JSON key (i.e `my-amp`), but you can override it using `destinationName` attribute:
+
+```
+{
+  ...
+  "my-amp": {
+    "enabled": true,
+    "path": "my-amp/target/my-amp.amp",
+    "destinationName" : "my.amp"
+    "destination": "/var/lib/tomcat7/amps",
+    "owner": "tomcat7"
+  }
+}
+```
+#### Including a single sub-folder
+
+You can only include one specific subfolder of a ZIP, using the following syntax:
+
+```
+{
+  ...
+  "sharedclasses": {
+    "enabled": true,
+    "groupId" : "org.alfresco",
+    "artifactId" : "alfresco-repository",
+    "version" : "5.0.a",
+    "destination": "/var/lib/tomcat7/keystore",
+    "subfolder": "alfresco/keystore/\*",
+    "owner": "tomcat7"
+  }
+}
+```
+
 Maven Private Repositories
 ---
 To access private Maven repositories, you can easily define your credentials (password encryption is supported, although it's strongly recommended to wipe out your Maven settings right after Chef installation is terminated)
