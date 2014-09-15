@@ -11,3 +11,4 @@ default['term_delimiter_end'] = "@@"
 default['property_equals_sign'] = "="
 
 default['maven']['master_password'] = ""
+default['maven']['purge_settings'] = true
