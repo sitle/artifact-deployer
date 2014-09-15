@@ -43,5 +43,6 @@ if purge_settings == true
   end
   directory  "/root/.m2" do
     action :delete
+    recursive :true
   end
 end
