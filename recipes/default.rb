@@ -41,7 +41,7 @@ if purge_settings == true
   file "#{m2_home}/conf/settings.xml" do
     action :delete
   end
-  file  "/root/.m2" do
+  directory  "/root/.m2" do
     action :delete
   end
 end
