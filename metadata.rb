@@ -7,7 +7,6 @@ long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version           "0.7.5"
 
 depends "maven"
-depends "file"
 
 recipe 'default', 'Installs Apache Maven'
 recipe 'artifacts', 'Installs Maven artifacts'
